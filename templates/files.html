@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Drive Files</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Google Drive Files</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Last Modified</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .Files}}
+    <tr>
+        <td>{{.Name}}</td>
+        <td>{{.MimeType}}</td>
+        <td>{{.ModifiedTime}}</td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+</body>
+</html>

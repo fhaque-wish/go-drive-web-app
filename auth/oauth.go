@@ -2,14 +2,11 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 )
 
 func HandleMain(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `<html><body>
-        <a href="/login">Google Log In</a>
-        </body></html>`)
+	http.ServeFile(w, r, "templates/login.html")
 }
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -30,13 +27,15 @@ func HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//client := googleOauthConfig.Client(context.Background(), token)
 	// Save the token to a file or session for later use
 	err = saveToken(token)
 	if err != nil {
 		http.Error(w, "Failed to save token", http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprint(w, "authentication successful")
-	//http.Redirect(w, r, "/listfiles", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
+}
+
+func HandleHome(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/home.html")
 }

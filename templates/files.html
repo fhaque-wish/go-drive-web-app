@@ -23,19 +23,22 @@
 <table>
     <thead>
     <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Type</th>
         <th>Last Modified</th>
+        <th>Actions</th>
     </tr>
     </thead>
     <tbody>
     {{range .Files}}
     <tr>
-        <td>{{.ID}}</td>
         <td>{{.Name}}</td>
         <td>{{.MimeType}}</td>
         <td>{{.ModifiedTime}}</td>
+        <td>
+            <a href="/download?id={{.ID}}">Download</a> |
+            <a href="/delete?id={{.ID}}" onclick="return confirm('Are you sure you want to delete this file?');">Delete</a>
+        </td>
     </tr>
     {{end}}
     </tbody>

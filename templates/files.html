@@ -11,7 +11,7 @@
         th, td {
             border: 1px solid #dddddd;
             text-align: left;
-            padding: 8px;
+            padding: 4px;
         }
         th {
             background-color: #f2f2f2;
@@ -23,6 +23,7 @@
 <table>
     <thead>
     <tr>
+        <th>ID</th>
         <th>Name</th>
         <th>Type</th>
         <th>Last Modified</th>
@@ -31,6 +32,7 @@
     <tbody>
     {{range .Files}}
     <tr>
+        <td>{{.ID}}</td>
         <td>{{.Name}}</td>
         <td>{{.MimeType}}</td>
         <td>{{.ModifiedTime}}</td>

@@ -1,9 +1,12 @@
 package drive
 
 import (
+	"context"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
+	"google-drive-web-app/auth"
+	"google.golang.org/api/drive/v3"
 	"os"
 )
 
@@ -29,3 +32,16 @@ func getToken() (*oauth2.Token, error) {
 	newClient.c = auth.GoogleOauthConfig.Client(context.Background(), token)
 	return &newClient
 }*/
+
+func getDriveService() (*drive.Service, error) {
+	driveService := drive.Service{}
+	token, err := getToken()
+	if err != nil {
+		log.Error("error getting token")
+		return &driveService, err
+	}
+
+	client := auth.GoogleOauthConfig.Client(context.Background(), token)
+	return drive.New(client)
+
+}

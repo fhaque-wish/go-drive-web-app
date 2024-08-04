@@ -39,10 +39,6 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Get the target folder from the form data
 	targetFolder := r.FormValue("folder")
-	if targetFolder == "" {
-		http.Error(w, "Target folder not specified", http.StatusBadRequest)
-		return
-	}
 
 	// Save the file locally (optional, for further processing if needed)
 	localFilePath := filepath.Join(os.TempDir(), handler.Filename)
@@ -75,8 +71,12 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	// Perform resumable upload
 	driveFile := &drive.File{
-		Name:    handler.Filename,
-		Parents: []string{folderID},
+		Name: handler.Filename,
+		//Parents: []string{folderID},
+	}
+	//upload into a specific folder
+	if folderID != "" {
+		driveFile.Parents = []string{folderID}
 	}
 
 	localFile, err = os.Open(localFilePath)

@@ -2,8 +2,14 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"google-drive-web-app/auth"
 	d "google-drive-web-app/drive"
+	"google.golang.org/api/drive/v3"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -100,4 +106,99 @@ func TestHandleFileUpload(t *testing.T) {
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
+}
+
+func TestHandleDownload(t *testing.T) {
+	fileName := "testfile.txt"
+	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
+	service, err := getDriveService()
+	if err != nil {
+		t.Fatal(err)
+	}
+	files, err := service.Files.List().Q(query).Do()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fileID := ""
+	if len(files.Files) == 0 {
+		t.Fatal("no files found")
+	}
+	fileID = files.Files[0].Id
+	req, err := http.NewRequest("GET", fmt.Sprintf("/download?id=%s", fileID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(d.HandleDownload)
+	handler.ServeHTTP(rr, req)
+
+	// Check the status code
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	// Check for Content-Disposition header
+	if disp := rr.Header().Get("Content-Disposition"); disp == "" {
+		t.Errorf("handler did not set Content-Disposition header")
+	}
+}
+
+func TestHandleDelete(t *testing.T) {
+	fileName := "testfile.txt"
+	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
+	service, err := getDriveService()
+	if err != nil {
+		t.Fatal(err)
+	}
+	files, err := service.Files.List().Q(query).Do()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fileID := ""
+	if len(files.Files) == 0 {
+		t.Fatal("no files found")
+	}
+	fileID = files.Files[0].Id
+	req, err := http.NewRequest("GET", fmt.Sprintf("/delete?id=%s", fileID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(d.HandleDelete)
+	handler.ServeHTTP(rr, req)
+
+	// Check the status code
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	// Check for expected output
+	expected := "File or folder deleted successfully"
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), expected)
+	}
+}
+
+func getDriveService() (*drive.Service, error) {
+	driveService := drive.Service{}
+	token, err := getToken()
+	if err != nil {
+		log.Error("error getting token")
+		return &driveService, err
+	}
+
+	client := auth.GoogleOauthConfig.Client(context.Background(), token)
+	return drive.New(client)
+}
+
+func getToken() (*oauth2.Token, error) {
+	f, err := os.Open("token.json")
+	if err != nil {
+		log.Error("error opening token.json")
+		return nil, err
+	}
+	defer f.Close()
+	var token oauth2.Token
+	err = json.NewDecoder(f).Decode(&token)
+	return &token, err
 }

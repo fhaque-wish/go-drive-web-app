@@ -37,6 +37,9 @@ func getDriveService() (*drive.Service, error) {
 
 // getOrCreateFolder checks if a folder exists and returns its ID, otherwise creates it
 func getOrCreateFolder(service *drive.Service, folderName string) (string, error) {
+	if folderName == "" {
+		return "", nil
+	}
 	query := fmt.Sprintf("name='%s' and mimeType='application/vnd.google-apps.folder' and trashed=false", folderName)
 	files, err := service.Files.List().Q(query).Do()
 	if err != nil {

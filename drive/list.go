@@ -30,17 +30,21 @@ func HandleListFiles(w http.ResponseWriter, r *http.Request) {
 			ModifiedTime: file.ModifiedTime,
 		})
 	}
+	renderListTemplate(&w, &fileInfos)
+}
 
+func renderListTemplate(w *http.ResponseWriter, f *[]FileInfo) {
 	tmpl, err := template.ParseFiles("templates/files.html")
 	if err != nil {
-		http.Error(w, "Failed to load template", http.StatusInternalServerError)
+		http.Error(*w, "Failed to load template", http.StatusInternalServerError)
+		return
+	}
+	//serving data to html
+	data := TemplateData{Files: *f}
+	err = tmpl.Execute(*w, data)
+	if err != nil {
+		http.Error(*w, "Failed to render template", http.StatusInternalServerError)
 		return
 	}
 
-	data := TemplateData{Files: fileInfos}
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Failed to render template", http.StatusInternalServerError)
-		return
-	}
 }

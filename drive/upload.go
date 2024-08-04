@@ -52,6 +52,7 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer localFile.Close()
+
 	_, err = io.Copy(localFile, file)
 	if err != nil {
 		http.Error(w, "Error saving local file", http.StatusInternalServerError)
@@ -85,37 +86,12 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer localFile.Close()
 
+	//resumble upload facilitates larger file upload
 	resumableUpload := driveService.Files.Create(driveFile).ResumableMedia(context.Background(), localFile, handler.Size, handler.Header.Get("Content-Type"))
 	uploadedFile, err := resumableUpload.Do()
 	if err != nil {
 		http.Error(w, "Failed to upload file", http.StatusInternalServerError)
 		return
 	}
-
 	fmt.Fprintf(w, "File uploaded successfully to folder '%s': %s", targetFolder, uploadedFile.Name)
-}
-
-// getOrCreateFolder checks if a folder exists and returns its ID, otherwise creates it
-func getOrCreateFolder(service *drive.Service, folderName string) (string, error) {
-	query := fmt.Sprintf("name='%s' and mimeType='application/vnd.google-apps.folder' and trashed=false", folderName)
-	files, err := service.Files.List().Q(query).Do()
-	if err != nil {
-		return "", err
-	}
-
-	if len(files.Files) > 0 {
-		return files.Files[0].Id, nil
-	}
-
-	folder := &drive.File{
-		Name:     folderName,
-		MimeType: "application/vnd.google-apps.folder",
-	}
-
-	createdFolder, err := service.Files.Create(folder).Do()
-	if err != nil {
-		return "", err
-	}
-
-	return createdFolder.Id, nil
 }

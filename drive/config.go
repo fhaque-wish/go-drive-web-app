@@ -1,10 +1,5 @@
 package drive
 
-/*type client struct {
-	c     *http.Client
-	token string
-}*/
-
 // FileInfo represents the information about a Google Drive file
 type FileInfo struct {
 	ID           string

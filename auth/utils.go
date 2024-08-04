@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
+	"net/http"
 	"os"
 )
 
@@ -26,4 +27,8 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func HandleHome(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/home.html")
 }

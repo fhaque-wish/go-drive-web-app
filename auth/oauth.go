@@ -35,7 +35,3 @@ func HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
 }
-
-func HandleHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/home.html")
-}

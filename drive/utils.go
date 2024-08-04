@@ -3,6 +3,7 @@ package drive
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"google-drive-web-app/auth"
@@ -22,17 +23,6 @@ func getToken() (*oauth2.Token, error) {
 	return &token, err
 }
 
-/*func initClient() *client {
-	newClient := client{}
-	token, err := getToken()
-	if err != nil {
-		return &newClient
-	}
-	newClient.token = token.AccessToken
-	newClient.c = auth.GoogleOauthConfig.Client(context.Background(), token)
-	return &newClient
-}*/
-
 func getDriveService() (*drive.Service, error) {
 	driveService := drive.Service{}
 	token, err := getToken()
@@ -43,5 +33,29 @@ func getDriveService() (*drive.Service, error) {
 
 	client := auth.GoogleOauthConfig.Client(context.Background(), token)
 	return drive.New(client)
+}
 
+// getOrCreateFolder checks if a folder exists and returns its ID, otherwise creates it
+func getOrCreateFolder(service *drive.Service, folderName string) (string, error) {
+	query := fmt.Sprintf("name='%s' and mimeType='application/vnd.google-apps.folder' and trashed=false", folderName)
+	files, err := service.Files.List().Q(query).Do()
+	if err != nil {
+		return "", err
+	}
+
+	if len(files.Files) > 0 {
+		return files.Files[0].Id, nil
+	}
+
+	folder := &drive.File{
+		Name:     folderName,
+		MimeType: "application/vnd.google-apps.folder",
+	}
+
+	createdFolder, err := service.Files.Create(folder).Do()
+	if err != nil {
+		return "", err
+	}
+
+	return createdFolder.Id, nil
 }

@@ -28,7 +28,7 @@ func TestHandleLogin(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(auth.HandleLogin)
 	handler.ServeHTTP(rr, req)
-
+	print(rr.Header())
 	// Check the status code
 	if status := rr.Code; status != http.StatusTemporaryRedirect {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusTemporaryRedirect)
@@ -38,6 +38,11 @@ func TestHandleLogin(t *testing.T) {
 	if loc := rr.Header().Get("Location"); loc == "" {
 		t.Errorf("handler did not redirect to authentication URL")
 	}
+}
+
+// this cannot be initiated from here as this callback will be initiated from Google Identity provider
+func TestHandleCallback(t *testing.T) {
+
 }
 
 func TestHandleListFiles(t *testing.T) {
@@ -109,12 +114,12 @@ func TestHandleFileUpload(t *testing.T) {
 }
 
 func TestHandleDownload(t *testing.T) {
-	fileName := "testfile.txt"
-	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
 	service, err := getDriveService()
 	if err != nil {
 		t.Fatal(err)
 	}
+	fileName := "testfile.txt"
+	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
 	files, err := service.Files.List().Q(query).Do()
 	if err != nil {
 		t.Fatal(err)
@@ -144,12 +149,12 @@ func TestHandleDownload(t *testing.T) {
 }
 
 func TestHandleDelete(t *testing.T) {
-	fileName := "testfile.txt"
-	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
 	service, err := getDriveService()
 	if err != nil {
 		t.Fatal(err)
 	}
+	fileName := "testfile.txt"
+	query := fmt.Sprintf("name='%s' and mimeType='text/plain' and trashed=false", fileName)
 	files, err := service.Files.List().Q(query).Do()
 	if err != nil {
 		t.Fatal(err)
@@ -202,3 +207,14 @@ func getToken() (*oauth2.Token, error) {
 	err = json.NewDecoder(f).Decode(&token)
 	return &token, err
 }
+
+/*
+Integration Tests:
+The api interaction workflow as:
+Auth -> List
+Auth -> Upload
+Auth -> Download (File information gotten from listfiles page)
+Auth -> Delete (File information gotten from listfiles page)
+The above tests was run against the application running in localhost and has maintained the above api
+workflow to pass the tests.
+*/

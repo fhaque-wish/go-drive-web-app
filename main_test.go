@@ -215,6 +215,6 @@ Auth -> List
 Auth -> Upload
 Auth -> Download (File information gotten from listfiles page)
 Auth -> Delete (File information gotten from listfiles page)
-The above tests was run against the application running in localhost and has maintained the above api
+The above tests were run against the application running in localhost and has maintained the above api
 workflow to pass the tests.
 */

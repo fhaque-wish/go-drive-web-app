@@ -37,8 +37,8 @@ The application will start at  http://localhost:8080
 ## Test Setup
 The `main_test.go` file contains the test cases. To run tests:
 1. Ensure the application is running.
-2. Ensure a user/service is authenticated with the application.
-3. Create a testfile.txt file in the project's root folder. This file is used to test upload, download, and delete functionalities. If there is a file name conflict, rename the file to a unique name and update the references in the `main_test.go` file.
+2. Ensure a test user is authenticated with the application and has access to a test google drive.
+3. Create a testfile.txt file in the project's root folder. This file is used to test upload, download, and delete functionalities. If there is a file name conflict in the test google drive, rename the `testfile.txt` to a unique name and update the references in the `main_test.go` file.
 4. Run the following command in a separate terminal:
 ```go
 go test -v

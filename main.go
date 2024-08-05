@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"google-drive-web-app/auth"
 	"google-drive-web-app/drive"
+	"google-drive-web-app/web"
 	"log"
 	"net/http"
 )
 
 func main() {
 	http.HandleFunc("/", auth.HandleMain)
-	http.HandleFunc("/home", auth.HandleHome)
+	http.HandleFunc("/home", web.HandleHome)
 	http.HandleFunc("/login", auth.HandleLogin)
 	http.HandleFunc("/callback", auth.HandleCallback)
 	http.HandleFunc("/listfiles", drive.HandleListFiles)

@@ -11,6 +11,7 @@ import (
 	"os"
 )
 
+// getToken retrieves oauth token from file
 func getToken() (*oauth2.Token, error) {
 	f, err := os.Open("token.json")
 	if err != nil {
@@ -23,6 +24,7 @@ func getToken() (*oauth2.Token, error) {
 	return &token, err
 }
 
+// getDriveService initiates drive service from google.golang.org/api/drive/v3 package to interact with google drive
 func getDriveService() (*drive.Service, error) {
 	driveService := drive.Service{}
 	token, err := getToken()
@@ -31,6 +33,7 @@ func getDriveService() (*drive.Service, error) {
 		return &driveService, err
 	}
 
+	// instantiates http client with oauth token
 	client := auth.GoogleOauthConfig.Client(context.Background(), token)
 	return drive.New(client)
 }

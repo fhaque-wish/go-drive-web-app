@@ -37,7 +37,7 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Get the target folder from the form data
+	// Get the target folder from the form data, empty values are allowed
 	targetFolder := r.FormValue("folder")
 
 	// Save the file locally (optional, for further processing if needed)

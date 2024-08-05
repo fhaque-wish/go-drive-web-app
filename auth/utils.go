@@ -5,10 +5,10 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
-	"net/http"
 	"os"
 )
 
+// saveToken saves oauth token
 func saveToken(token *oauth2.Token) error {
 	f, err := os.Create("token.json")
 	if err != nil {
@@ -27,8 +27,4 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
-}
-
-func HandleHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/home.html")
 }

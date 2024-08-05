@@ -19,7 +19,6 @@ import (
 	"testing"
 )
 
-// unit test
 func TestHandleLogin(t *testing.T) {
 	req, err := http.NewRequest("GET", "/login", nil)
 	if err != nil {
